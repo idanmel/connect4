@@ -1,0 +1,2 @@
+class NoBoard(Exception):
+    pass
