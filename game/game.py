@@ -5,16 +5,18 @@ Connect 4
 from typing import List
 import numpy as np
 
+from .exceptions import CellIsNotEmpty, GameOver
+
 
 EMPTY_CELL = '-'
-COLORS = 'gr' + EMPTY_CELL
+COLORS = 'gr'
 
 
-def is_winning_row(row: str, amount_to_win=4) -> bool:
+def get_player_won(row: str, amount_to_win=4) -> str:
     """Given a row, return True if there are enough adjacent pieces of the same player"""
     for c in COLORS:
         if c * amount_to_win in row:
-            return True
+            return c
 
 
 class Board:
@@ -43,6 +45,21 @@ class Board:
 
         return [d.tolist() for d in diagonals]
 
+    def update_board(self, color: str, row: int, column: int):
+        """update board only if the cell is valid and empty
+
+        Will raise IndexError if given an invalid row or column
+        Will raise CellIsNotEmpty is the cell is not empty
+        """
+        if self._np_array[row][column] == EMPTY_CELL:
+            self._np_array[row][column] = color
+        else:
+            raise CellIsNotEmpty
+
+    def is_full(self) -> bool:
+        """Return True if there are no EMPTY_CELL cells on the board"""
+        return EMPTY_CELL not in self._np_array
+
     def __iter__(self):
         """Iterate through all the lines, columns and diagonals on the board"""
         for row in self.rows:
@@ -57,6 +74,7 @@ class Board:
         return self._np_array.size
 
     def __eq__(self, other) -> bool:
+        """Return True if two boards are equal"""
         return np.array_equal(self.rows, other.rows)
 
     def __str__(self) -> str:
@@ -69,31 +87,35 @@ class Board:
 
 
 class Game:
-    def __init__(self, board: Board, amount_to_win=4):
+    def __init__(self, board: Board = Board(), amount_to_win=4):
         """A game of connect 4"""
         self.board = board
         self.amount_to_win = amount_to_win
 
-    def has_moves_left(self) -> bool:
-        """Return true if there at least one EMPTY_CELL on the board"""
-        return EMPTY_CELL in self.board._np_array
-
-    def is_won(self) -> bool:
-        """Return true if a winning line is found"""
-        lines = list(self.board)
-        return any([is_winning_row(''.join(line), self.amount_to_win) for line in lines])
+    def player_won(self) -> str:
+        """Return True if a winning line is found"""
+        for line in self.board:
+            c = get_player_won(''.join(line), self.amount_to_win)
+            if c:
+                return c
 
     def is_draw(self) -> bool:
-        """Return true if there are no move left and game was not won"""
-        return not any([self.has_moves_left(), self.is_won()])
+        """Return True if there are no move left and game was not won"""
+        return self.board.is_full() and not self.player_won()
 
-    # def get_row(self, column) -> int:
-    #     for i, row in enumerate(self.board.rows):
-    #         if row[column] == EMPTY_CELL:
-    #             return i
-    #
-    # def move(self, column: int) -> None:
-    #     rows = self.board.rows
-    #     n = self.get_row(column)
-    #     rows[n] = rows[n][:column] + '1' + rows[n][column + 1:]
-    #     self.board = Board(rows)
+    def get_player_to_move(self) -> str:
+        """Return the color of the player that is next to move"""
+        if (len(self.board) - str(self.board.rows).count(EMPTY_CELL)) % 2 == 0:
+            return 'r'
+        return 'g'
+
+    def move(self, row, column):
+        """Make a move
+
+        If the game is over, raise GameOVer
+        """
+        if self.player_won() or self.is_draw():
+            raise GameOver
+        self.board.update_board(self.get_player_to_move(), row, column)
+        if self.player_won() or self.is_draw():
+            raise GameOver
