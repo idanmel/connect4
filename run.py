@@ -9,11 +9,14 @@ while True:
         g.move(row, column)
     except (CellIsNotEmpty, ValueError, IndexError):
         print('\n***Please choose your move again***')
-    except (GameOver, KeyboardInterrupt):
+    except GameOver:
         if g.is_draw():
             print("\n***Game finished in draw")
         else:
             print(f"\n***{g.player_won()} won!!!***")
+        break
+    except (KeyboardInterrupt, EOFError):
+        print("\nWhat did you do that for?")
         break
     finally:
         print(g.board)
