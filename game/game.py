@@ -21,12 +21,13 @@ def get_player_won(row: str, amount_to_win=4) -> str:
 
 class Board:
     """The board"""
-    def __init__(self, rows: List[str]=None, size=(6, 7)):
-        self.size = size
+    def __init__(self, rows: List[str]=None, shape=(6, 7)):
         if rows:
             self._np_array = np.array([list(row) for row in rows])
+            self.shape = self._np_array.shape
         else:
-            self._np_array = np.full(self.size, EMPTY_CELL)
+            self.shape = shape
+            self._np_array = np.full(self.shape, EMPTY_CELL)
 
     @property
     def rows(self):
@@ -59,6 +60,17 @@ class Board:
     def is_full(self) -> bool:
         """Return True if there are no EMPTY_CELL cells on the board"""
         return EMPTY_CELL not in self._np_array
+
+    def get_column(self, column):
+        """Return the column"""
+        return self._np_array[:, column]
+
+    def get_empty_row_number(self, column):
+        for i, v in enumerate(reversed(self.get_column(column))):
+            if v == EMPTY_CELL:
+                return self.shape[0] - 1 - i
+
+        raise IndexError
 
     def __iter__(self):
         """Iterate through all the lines, columns and diagonals on the board"""
@@ -93,7 +105,7 @@ class Game:
         self.amount_to_win = amount_to_win
 
     def player_won(self) -> str:
-        """Return True if a winning line is found"""
+        """Return the winning player, if found"""
         for line in self.board:
             c = get_player_won(''.join(line), self.amount_to_win)
             if c:
@@ -109,13 +121,15 @@ class Game:
             return 'r'
         return 'g'
 
-    def move(self, row, column):
-        """Make a move
-
-        If the game is over, raise GameOVer
+    def drop_piece(self, column):
+        """Make a move If the game is over, raise GameOver
         """
         if self.player_won() or self.is_draw():
             raise GameOver
-        self.board.update_board(self.get_player_to_move(), row, column)
+
+        p = self.get_player_to_move()
+        row = self.board.get_empty_row_number(column)
+        self.board.update_board(p, row, column)
+
         if self.player_won() or self.is_draw():
             raise GameOver

@@ -1,13 +1,12 @@
 from game.game import Game
-from game.exceptions import CellIsNotEmpty, GameOver
+from game.exceptions import GameOver
 
 g = Game()
 while True:
     try:
-        row = int(input("Row: "))
-        column = int(input("Column: "))
-        g.move(row, column)
-    except (CellIsNotEmpty, ValueError, IndexError):
+        column = int(input("Enter Column: "))
+        g.drop_piece(column)
+    except (ValueError, IndexError):
         print('\n***Please choose your move again***')
     except GameOver:
         if g.is_draw():
@@ -17,6 +16,6 @@ while True:
         break
     except (KeyboardInterrupt, EOFError):
         print("\nWhat did you do that for?")
-        break
+        exit(1)
     finally:
         print(g.board)

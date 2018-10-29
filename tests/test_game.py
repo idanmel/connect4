@@ -75,15 +75,15 @@ class TestBoardLen:
 
 class TestColumns:
     def test_default(self):
-        b = Board(size=(1, 2))
-        b2 = Board(size=(2, 1))
+        b = Board(shape=(1, 2))
+        b2 = Board(shape=(2, 1))
         assert str(b.rows) == str(b2.columns)
 
 
 class TestDiagonals:
     def test_diagonals(self):
         b = Board()
-        assert len(b.diagonals) == (b.size[0] + b.size[1] - 1) * 2
+        assert len(b.diagonals) == (b.shape[0] + b.shape[1] - 1) * 2
 
     def test_one_diagonal(self):
         board = [EMPTY_CELL]
@@ -136,7 +136,7 @@ class TestGameWon:
         assert g.player_won() == 'r'
 
     def test_game_not_won(self):
-        g = Game(Board('ggrg'))
+        g = Game(Board(['ggrg']))
         assert not g.player_won()
 
 
@@ -209,27 +209,36 @@ class TestPlayerTurn:
 class TestMove:
     def test_move_no_draw_no_win(self):
         g = Game(Board(['--']))
-        g.move(row=0, column=0)
-        assert g.board == Board(['r-'])
+        # g.drop_piece(column=0)
+        assert g.board.shape == (1, 2)
 
     def test_move_after_won(self):
         g = Game(Board(['rrrr']))
         with pytest.raises(GameOver):
-            g.move(0, 0)
+            g.drop_piece(0)
 
     def test_move_leading_to_win(self):
         g = Game(Board(['ggg-', 'rrr-']))
         with pytest.raises(GameOver):
-            g.move(1, 3)
+            g.drop_piece(3)
 
     def test_move_after_drawn(self):
         g = Game(Board(['r']))
         with pytest.raises(GameOver):
-            g.move(0, 0)
+            g.drop_piece(0)
 
     def test_move_leading_to_draw(self):
         g = Game(Board(['-']))
         with pytest.raises(GameOver):
-            g.move(0, 0)
+            g.drop_piece(0)
 
 
+class TestGetEmptyRowNumber:
+    def test_valid_row(self):
+        b = Board(['-'])
+        assert b.get_empty_row_number(0) == 0
+
+    def test_invalid_row(self):
+        b = Board(['r'])
+        with pytest.raises(IndexError):
+            b.get_empty_row_number(0)
