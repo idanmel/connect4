@@ -2,5 +2,9 @@ class CellIsNotEmpty(Exception):
     pass
 
 
-class GameOver(Exception):
+class GameDrawn(Exception):
+    pass
+
+
+class GameWon(Exception):
     pass

@@ -2,7 +2,7 @@ import pytest
 from itertools import product
 
 from game.game import get_player_won, COLORS, Board, Game, EMPTY_CELL
-from game.exceptions import CellIsNotEmpty, GameOver
+from game.exceptions import CellIsNotEmpty, GameDrawn, GameWon
 
 rows = ["".join(row) for row in (list(product(COLORS, repeat=6)))]
 
@@ -209,27 +209,27 @@ class TestPlayerTurn:
 class TestMove:
     def test_move_no_draw_no_win(self):
         g = Game(Board(['--']))
-        # g.drop_piece(column=0)
-        assert g.board.shape == (1, 2)
+        g.drop_piece(column=0)
+        assert not g.board.is_full()
 
     def test_move_after_won(self):
         g = Game(Board(['rrrr']))
-        with pytest.raises(GameOver):
+        with pytest.raises(GameWon):
             g.drop_piece(0)
 
     def test_move_leading_to_win(self):
         g = Game(Board(['ggg-', 'rrr-']))
-        with pytest.raises(GameOver):
+        with pytest.raises(GameWon):
             g.drop_piece(3)
 
     def test_move_after_drawn(self):
         g = Game(Board(['r']))
-        with pytest.raises(GameOver):
+        with pytest.raises(GameDrawn):
             g.drop_piece(0)
 
     def test_move_leading_to_draw(self):
         g = Game(Board(['-']))
-        with pytest.raises(GameOver):
+        with pytest.raises(GameDrawn):
             g.drop_piece(0)
 
 

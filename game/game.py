@@ -5,7 +5,7 @@ Connect 4
 from typing import List
 import numpy as np
 
-from .exceptions import CellIsNotEmpty, GameOver
+from .exceptions import CellIsNotEmpty, GameDrawn, GameWon
 
 
 EMPTY_CELL = '-'
@@ -124,12 +124,19 @@ class Game:
     def drop_piece(self, column):
         """Make a move If the game is over, raise GameOver
         """
-        if self.player_won() or self.is_draw():
-            raise GameOver
+        if self.is_draw():
+            raise GameDrawn
+
+        if self.player_won():
+            raise GameWon
 
         p = self.get_player_to_move()
         row = self.board.get_empty_row_number(column)
         self.board.update_board(p, row, column)
 
-        if self.player_won() or self.is_draw():
-            raise GameOver
+        if self.is_draw():
+            raise GameDrawn
+
+        if self.player_won():
+            raise GameWon
+
