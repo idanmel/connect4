@@ -19,6 +19,26 @@ def get_player_won(row: str, amount_to_win=4) -> str:
             return c
 
 
+def is_column_full(column):
+    """Return True if the column has no empty cells"""
+    return EMPTY_CELL not in column
+
+
+def get_possible_moves(board) -> List[int]:
+    columns = []
+    num_of_cols = board.shape[1]
+    for i in range(num_of_cols):
+        c = board.get_column(i)
+        if not is_column_full(c):
+            columns.append(i)
+
+    return columns
+
+
+def get_cloned_game(g):
+    return Game(board=g.board)
+
+
 class Board:
     """The board"""
     def __init__(self, rows: List[str]=None, shape=(6, 7)):
@@ -140,3 +160,5 @@ class Game:
         if self.player_won():
             raise GameWon
 
+    def __eq__(self, other):
+        return self.board == other.board

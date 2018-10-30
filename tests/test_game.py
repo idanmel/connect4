@@ -1,7 +1,7 @@
 import pytest
 from itertools import product
 
-from game.game import get_player_won, COLORS, Board, Game, EMPTY_CELL
+from game.game import get_player_won, COLORS, Board, Game, EMPTY_CELL, get_cloned_game
 from game.exceptions import CellIsNotEmpty, GameDrawn, GameWon
 
 rows = ["".join(row) for row in (list(product(COLORS, repeat=6)))]
@@ -242,3 +242,10 @@ class TestGetEmptyRowNumber:
         b = Board(['r'])
         with pytest.raises(IndexError):
             b.get_empty_row_number(0)
+
+
+class TestCopyGame:
+    def test_games_are_equal(self):
+        b = Board(['gr-'])
+        g = Game(b)
+        assert g == get_cloned_game(g)
