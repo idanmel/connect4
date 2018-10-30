@@ -9,10 +9,10 @@ def run():
         try:
             p = g.get_player_to_move()
             if p == 'r':
-                column = Monte.get_best_column(board=g.board, number_of_games=10)
+                print('\n*** Let me think... ***')
+                column = Monte.get_best_column(board=g.board, number_of_games=5000)
             else:
-                column = int(input("Enter Column: "))
-                print("\n*** Aha! Now I'll get you! ***")
+                column = int(input("Enter Column: ")) - 1
             g.drop_piece(column)
         except (ValueError, IndexError):
             print('\n*** Please choose your move again ***')
@@ -20,13 +20,13 @@ def run():
             print("\n*** Game ended in a draw ***")
             return
         except GameWon:
-            print(f"\n*** {g.player_won()} won!!! ***")
+            print(f"\n*** {p} won!!! ***")
             return
         except (KeyboardInterrupt, EOFError):
             print("\nWhat did you do that for?")
             return
         finally:
-            print(g.board)
+            print("\n" + str(g.board))
 
 
 if __name__ == '__main__':

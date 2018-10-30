@@ -12,11 +12,11 @@ EMPTY_CELL = '-'
 COLORS = 'gr'
 
 
-def get_player_won(row: str, amount_to_win=4) -> str:
+def is_winning_row(row: str, amount_to_win=4) -> bool:
     """Given a row, return True if there are enough adjacent pieces of the same player"""
     for c in COLORS:
         if c * amount_to_win in row:
-            return c
+            return True
 
 
 def is_column_full(column):
@@ -111,7 +111,7 @@ class Board:
 
     def __str__(self) -> str:
         """Return the rows as a string"""
-        return "\n".join([''.join(row) for row in self.rows])
+        return "\n".join([' '.join(row) for row in self.rows])
 
     def __repr__(self) -> str:
         s = [''.join(row) for row in self._np_array]
@@ -124,12 +124,9 @@ class Game:
         self.board = board
         self.amount_to_win = amount_to_win
 
-    def player_won(self) -> str:
+    def player_won(self) -> bool:
         """Return the winning player, if found"""
-        for line in self.board:
-            c = get_player_won(''.join(line), self.amount_to_win)
-            if c:
-                return c
+        return any([is_winning_row(''.join(line), self.amount_to_win) for line in self.board])
 
     def is_draw(self) -> bool:
         """Return True if there are no move left and game was not won"""

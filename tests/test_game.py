@@ -1,7 +1,7 @@
 import pytest
 from itertools import product
 
-from game.game import get_player_won, COLORS, Board, Game, EMPTY_CELL, get_cloned_game
+from game.game import is_winning_row, COLORS, Board, Game, EMPTY_CELL, get_cloned_game
 from game.exceptions import CellIsNotEmpty, GameDrawn, GameWon
 
 rows = ["".join(row) for row in (list(product(COLORS, repeat=6)))]
@@ -16,12 +16,12 @@ def test_rows():
 
 def test_winning_rows():
     for row in winning_rows:
-        assert get_player_won(row)
+        assert is_winning_row(row)
 
 
 def test_not_winning_rows():
     for row in not_winning_rows:
-        assert not get_player_won(row)
+        assert not is_winning_row(row)
 
 
 class TestStr:
@@ -122,22 +122,6 @@ class TestBoardIsFull:
     def test_board_has_empty_cells(self):
         b = Board()
         assert not b.is_full()
-
-
-class TestGameWon:
-    def test_green_player_won(self):
-        board = ['gggg']
-        g = Game(board=Board(board))
-        assert g.player_won() == 'g'
-
-    def test_red_player_won(self):
-        board = ['rrrr']
-        g = Game(board=Board(board))
-        assert g.player_won() == 'r'
-
-    def test_game_not_won(self):
-        g = Game(Board(['ggrg']))
-        assert not g.player_won()
 
 
 class TestIsDraw:
