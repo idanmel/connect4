@@ -31,7 +31,7 @@ class TestStr:
 
     def test_many_cells(self):
         b = Board(['rr', 'gg'])
-        assert b.__str__() == 'rr\ngg'
+        assert b.__str__() == 'r r\ng g'
 
 
 class TestRepr:
@@ -226,10 +226,3 @@ class TestGetEmptyRowNumber:
         b = Board(['r'])
         with pytest.raises(IndexError):
             b.get_empty_row_number(0)
-
-
-class TestCopyGame:
-    def test_games_are_equal(self):
-        b = Board(['gr-'])
-        g = Game(b)
-        assert g == get_cloned_game(g)

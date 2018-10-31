@@ -156,6 +156,3 @@ class Game:
 
         if self.player_won():
             raise GameWon
-
-    def __eq__(self, other):
-        return self.board == other.board
