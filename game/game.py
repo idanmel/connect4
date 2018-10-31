@@ -138,7 +138,7 @@ class Game:
             return 'r'
         return 'g'
 
-    def drop_piece(self, column):
+    def drop_piece(self, column, invert_player=False):
         """Make a move If the game is over, raise GameOver
         """
         if self.is_draw():
@@ -148,6 +148,11 @@ class Game:
             raise GameWon
 
         p = self.get_player_to_move()
+        if invert_player:
+            if p == 'r':
+                p = 'g'
+            if p == 'g':
+                p = 'r'
         row = self.board.get_empty_row_number(column)
         self.board.update_board(p, row, column)
 

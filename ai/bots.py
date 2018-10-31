@@ -28,13 +28,29 @@ def get_random_game_result(board, column) -> bool:
             return g.get_player_to_move() == 'g'
 
 
+def found_opponent_winning_move(board, column):
+    copied_board = board.rows
+    g = Game(Board(rows=copied_board))
+    try:
+        g.drop_piece(column, invert_player=True)
+    except GameDrawn:
+        return False
+    except GameWon:
+        return True
+
+
 class Monte:
 
     @staticmethod
-    def get_best_column(board, number_of_games=1000):
-        winrate = []
+    def get_best_column(board, number_of_games=1000) -> int:
+
         columns = get_possible_moves(board)
+        for column in columns:
+            if found_opponent_winning_move(board, column):
+                return column
+
         games_per_column = number_of_games // len(columns)
+        winrate = []
         for column in columns:
             wins = 0
             for i in range(games_per_column):
