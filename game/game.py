@@ -3,13 +3,14 @@ Connect 4
 """
 
 from typing import List
+import itertools
 import numpy as np
 
 from .exceptions import CellIsNotEmpty, GameDrawn, GameWon
 
 
 EMPTY_CELL = '-'
-COLORS = 'gr'
+COLORS = 'rg'
 
 
 def is_winning_row(row: str, amount_to_win=4) -> bool:
@@ -37,6 +38,18 @@ def get_possible_moves(board) -> List[int]:
 
 def get_cloned_game(g):
     return Game(board=g.board)
+
+
+class Player:
+
+    def get_column(self, board=None) -> int:
+        raise NotImplementedError
+
+
+class HumanPlayer(Player):
+
+    def get_column(self, board=None) -> int:
+        return int(input("Enter Column: ")) - 1
 
 
 class Board:
@@ -119,9 +132,14 @@ class Board:
 
 
 class Game:
-    def __init__(self, board: Board = Board(), amount_to_win=4):
+    def __init__(self, player1: Player = HumanPlayer(), player2: Player = HumanPlayer(),
+                 board: Board = Board(), amount_to_win=4):
         """A game of connect 4"""
+        self.colors = COLORS
+        self.players = (player1, player2)
         self.board = board
+        self.current_player = self.get_player_to_move()
+        self.current_color = self.get_color_to_move()
         self.amount_to_win = amount_to_win
 
     def player_won(self) -> bool:
@@ -132,14 +150,29 @@ class Game:
         """Return True if there are no move left and game was not won"""
         return self.board.is_full() and not self.player_won()
 
-    def get_player_to_move(self) -> str:
+    def get_player_to_move(self) -> Player:
         """Return the color of the player that is next to move"""
         if (len(self.board) - str(self.board.rows).count(EMPTY_CELL)) % 2 == 0:
-            return 'r'
-        return 'g'
+            return self.players[0]
+        return self.players[1]
 
-    def drop_piece(self, column, invert_player=False):
-        """Make a move If the game is over, raise GameOver
+    def get_color_to_move(self) -> str:
+        """Return the next color"""
+        if (len(self.board) - str(self.board.rows).count(EMPTY_CELL)) % 2 == 0:
+            return self.colors[0]
+        return self.colors[1]
+
+    def get_opponent_color(self) -> str:
+        """Return opponent color"""
+        if self.get_color_to_move() == self.colors[0]:
+            return self.colors[1]
+        return self.colors[0]
+
+    def make_move(self, column=None, color=None):
+        """
+        If a player won, raise GameWon
+        if it's a draw, raise GameDrawn
+        If invert is True, play as the other player
         """
         if self.is_draw():
             raise GameDrawn
@@ -147,14 +180,14 @@ class Game:
         if self.player_won():
             raise GameWon
 
-        p = self.get_player_to_move()
-        if invert_player:
-            if p == 'r':
-                p = 'g'
-            if p == 'g':
-                p = 'r'
+        if not color:
+            self.current_player = self.get_player_to_move()
+            self.current_color = self.get_color_to_move()
+
+        if column is None:
+            column = self.current_player.get_column(self.board)
         row = self.board.get_empty_row_number(column)
-        self.board.update_board(p, row, column)
+        self.board.update_board(self.current_color, row, column)
 
         if self.is_draw():
             raise GameDrawn

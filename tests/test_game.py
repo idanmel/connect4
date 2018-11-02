@@ -1,7 +1,7 @@
 import pytest
 from itertools import product
 
-from game.game import is_winning_row, COLORS, Board, Game, EMPTY_CELL, get_cloned_game
+from game.game import is_winning_row, COLORS, Board, Game, EMPTY_CELL
 from game.exceptions import CellIsNotEmpty, GameDrawn, GameWon
 
 rows = ["".join(row) for row in (list(product(COLORS, repeat=6)))]
@@ -127,12 +127,12 @@ class TestBoardIsFull:
 class TestIsDraw:
     def test_has_moves_not_won(self):
         b = Board([EMPTY_CELL])
-        g = Game(b)
+        g = Game(board=b)
         assert not g.is_draw()
 
     def test_no_moves_not_won(self):
         b = Board(['r'])
-        g = Game(b)
+        g = Game(board=b)
         assert g.is_draw()
 
     def test_no_moves_won(self):
@@ -140,7 +140,7 @@ class TestIsDraw:
             'gggg'
         ]
         b = Board(board)
-        g = Game(b)
+        g = Game(board=b)
         assert not g.is_draw()
 
     def test_has_moves_won(self):
@@ -182,39 +182,39 @@ class TestUpdateBoard:
 
 class TestPlayerTurn:
     def test_odd_move(self):
-        g = Game(Board())
-        assert g.get_player_to_move() == 'r'
+        g = Game(board=Board())
+        assert g.get_color_to_move() == 'r'
 
     def test_even_move(self):
-        g = Game(Board(['-r']))
-        assert g.get_player_to_move() == 'g'
+        g = Game(board=Board(['-r']))
+        assert g.get_color_to_move() == 'g'
 
 
 class TestMove:
     def test_move_no_draw_no_win(self):
-        g = Game(Board(['--']))
-        g.drop_piece(column=0)
+        g = Game(board=Board(['--']))
+        g.make_move(column=0)
         assert not g.board.is_full()
 
     def test_move_after_won(self):
-        g = Game(Board(['rrrr']))
+        g = Game(board=Board(['rrrr']))
         with pytest.raises(GameWon):
-            g.drop_piece(0)
+            g.make_move(0)
 
     def test_move_leading_to_win(self):
-        g = Game(Board(['ggg-', 'rrr-']))
+        g = Game(board=Board(['ggg-', 'rrr-']))
         with pytest.raises(GameWon):
-            g.drop_piece(3)
+            g.make_move(3)
 
     def test_move_after_drawn(self):
-        g = Game(Board(['r']))
+        g = Game(board=Board(['r']))
         with pytest.raises(GameDrawn):
-            g.drop_piece(0)
+            g.make_move(0)
 
     def test_move_leading_to_draw(self):
-        g = Game(Board(['-']))
+        g = Game(board=Board(['-']))
         with pytest.raises(GameDrawn):
-            g.drop_piece(0)
+            g.make_move(0)
 
 
 class TestGetEmptyRowNumber:

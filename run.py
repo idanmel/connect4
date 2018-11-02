@@ -1,26 +1,21 @@
-from game.game import Game
+from game.game import Game, HumanPlayer
 from game.exceptions import GameDrawn, GameWon
 from ai.bots import Monte
 
 
 def run():
-    g = Game()
+
+    g = Game(player1=Monte(number_of_games=7), player2=HumanPlayer())
     while True:
         try:
-            p = g.get_player_to_move()
-            if p == 'r':
-                print('\n*** Let me think... ***')
-                column = Monte.get_best_column(board=g.board, number_of_games=5000)
-            else:
-                column = int(input("Enter Column: ")) - 1
-            g.drop_piece(column)
+            g.make_move()
         except (ValueError, IndexError):
             print('\n*** Please choose your move again ***')
         except GameDrawn:
             print("\n*** Game ended in a draw ***")
             return
         except GameWon:
-            print(f"\n*** {p} won!!! ***")
+            print(f"\n*** {g.current_color} won!!! ***")
             return
         except (KeyboardInterrupt, EOFError):
             print("\nWhat did you do that for?")
