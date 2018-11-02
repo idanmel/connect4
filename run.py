@@ -21,6 +21,7 @@ def get_players():
 def play_game(player1=HumanPlayer(), player2=Monte()):
 
     g = Game(player1, player2)
+    print("\n" + str(g.board))
     while True:
         try:
             g.make_move()

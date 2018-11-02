@@ -52,6 +52,7 @@ class Monte(Player):
 
     def get_column(self, board=None) -> int:
 
+        print("\n*** Hmmm... Let me think... ***")
         columns = get_possible_moves(board)
         for column in columns:
             if found_opponent_winning_move(board, column):
