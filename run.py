@@ -5,7 +5,7 @@ from ai.bots import Monte
 
 def run():
 
-    g = Game(player1=Monte(number_of_games=7), player2=HumanPlayer())
+    g = Game(player1=Monte(number_of_games=5000), player2=HumanPlayer())
     while True:
         try:
             g.make_move()
