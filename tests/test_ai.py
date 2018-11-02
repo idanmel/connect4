@@ -1,4 +1,8 @@
-from game.game import Board, Game, is_column_full, EMPTY_CELL, get_possible_moves
+import pytest
+
+from game.game import Board, is_column_full, EMPTY_CELL, get_possible_moves
+from ai.bots import found_opponent_winning_move
+from game.exceptions import GameWon
 
 
 class TestIsColumnFull:
@@ -28,6 +32,12 @@ class TestFindPossibleMoves:
             'g-'
         ])
         assert len(get_possible_moves(b)) > 1
+
+
+class TestFindOpponentWinningMove:
+    def test_nope(self):
+        b = Board(['rrr-'])
+        assert found_opponent_winning_move(b, 3)
 
 
 # class TestGetWinningMove:

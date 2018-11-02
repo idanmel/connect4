@@ -180,9 +180,12 @@ class Game:
         if self.player_won():
             raise GameWon
 
-        if not color:
+        if color:
+            self.current_color = color
+        else:
             self.current_player = self.get_player_to_move()
             self.current_color = self.get_color_to_move()
+
 
         if column is None:
             column = self.current_player.get_column(self.board)
