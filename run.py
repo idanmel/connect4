@@ -1,11 +1,26 @@
 from game.game import Game, HumanPlayer
 from game.exceptions import GameDrawn, GameWon
-from ai.bots import Monte
+from ai.bots import Monte, RandomBot
+import argparse
 
 
-def run():
+def get_players():
+    bot_options = {
+        'human': HumanPlayer,
+        'random': RandomBot,
+        'monte': Monte
+    }
+    parser = argparse.ArgumentParser()
+    parser.add_argument('p1', help="Choose the first player", choices=bot_options.keys())
+    parser.add_argument('p2', help="Choose the second player", choices=bot_options.keys())
+    args = parser.parse_args()
 
-    g = Game(player1=Monte(number_of_games=5000), player2=HumanPlayer())
+    return bot_options[args.p1](), bot_options[args.p2]()
+
+
+def play_game(player1=HumanPlayer(), player2=Monte()):
+
+    g = Game(player1, player2)
     while True:
         try:
             g.make_move()
@@ -25,4 +40,5 @@ def run():
 
 
 if __name__ == '__main__':
-    run()
+    player1, player2 = get_players()
+    play_game(player1, player2)
