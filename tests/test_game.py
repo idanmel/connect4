@@ -128,12 +128,12 @@ class TestIsDraw:
     def test_has_moves_not_won(self):
         b = Board([EMPTY_CELL])
         g = Game(board=b)
-        assert not g.is_draw()
+        assert not g.is_draw(0, 0)
 
     def test_no_moves_not_won(self):
         b = Board(['r'])
         g = Game(board=b)
-        assert g.is_draw()
+        assert g.is_draw(0, 0)
 
     def test_no_moves_won(self):
         board = [
@@ -141,7 +141,7 @@ class TestIsDraw:
         ]
         b = Board(board)
         g = Game(board=b)
-        assert not g.is_draw()
+        assert not g.is_draw(3, 0)
 
     def test_has_moves_won(self):
         board = [
@@ -154,7 +154,7 @@ class TestIsDraw:
             EMPTY_CELL + 'gggg' + EMPTY_CELL * 2,
         ]
         g = Game(board=Board(board))
-        assert not g.is_draw()
+        assert not g.is_draw(4, 0)
 
 
 class TestUpdateBoard:
@@ -206,20 +206,10 @@ class TestMove:
         g.make_move(column=0)
         assert not g.board.is_full()
 
-    def test_move_after_won(self):
-        g = Game(board=Board(['rrrr']))
-        with pytest.raises(GameWon):
-            g.make_move(0)
-
     def test_move_leading_to_win(self):
         g = Game(board=Board(['ggg-', 'rrr-']))
         with pytest.raises(GameWon):
             g.make_move(3)
-
-    def test_move_after_drawn(self):
-        g = Game(board=Board(['r']))
-        with pytest.raises(GameDrawn):
-            g.make_move(0)
 
     def test_move_leading_to_draw(self):
         g = Game(board=Board(['-']))
@@ -248,3 +238,12 @@ class TestPlayer:
         p = Player()
         with pytest.raises(NotImplementedError):
             c = p.get_column()
+
+
+class TestGetRowsByCell:
+    def test_row(self):
+        b = Board([
+            'r-g',
+            'rg-'
+        ])
+        assert b.get_rows_by_cell(1, 0) == [['r', '-', 'g'], ['-', 'g'], ['-', '-'], ['-', 'r']]

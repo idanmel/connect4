@@ -74,6 +74,15 @@ class Board:
 
         return [d.tolist() for d in diagonals]
 
+    def get_rows_by_cell(self, x: int, y: int) -> List[list]:
+        """Get the row, column and two diagonals that intersect a specific cell"""
+        rows = list()
+        rows.append(list(self._np_array[y]))
+        rows.append(list(self._np_array[:, x]))
+        rows.append(list(np.diagonal(self._np_array, offset=(x - y))))
+        rows.append(list(np.diagonal(np.rot90(self._np_array), offset=-self._np_array.shape[1] + (x + y) + 1)))
+        return rows
+
     def update_board(self, color: str, row: int, column: int):
         """update board only if the cell is valid and empty
 
@@ -94,6 +103,7 @@ class Board:
         return self._np_array[:, column]
 
     def get_empty_row_number(self, column):
+        """Get the lowest empty row for a given column"""
         for i, v in enumerate(reversed(self.get_column(column))):
             if v == EMPTY_CELL:
                 return self.shape[0] - 1 - i
@@ -137,13 +147,13 @@ class Game:
         self.current_color = self.get_color_to_move()
         self.amount_to_win = amount_to_win
 
-    def player_won(self) -> bool:
+    def player_won(self, column, row) -> bool:
         """Return the winning player, if found"""
-        return any([is_winning_row(''.join(line), self.amount_to_win) for line in self.board])
+        return any([is_winning_row(''.join(line), self.amount_to_win) for line in self.board.get_rows_by_cell(column, row)])
 
-    def is_draw(self) -> bool:
+    def is_draw(self, column, row) -> bool:
         """Return True if there are no move left and game was not won"""
-        return self.board.is_full() and not self.player_won()
+        return self.board.is_full() and not self.player_won(column, row)
 
     def get_player_to_move(self) -> Player:
         """Return the color of the player that is next to move"""
@@ -169,11 +179,6 @@ class Game:
         if it's a draw, raise GameDrawn
         If invert is True, play as the other player
         """
-        if self.is_draw():
-            raise GameDrawn
-
-        if self.player_won():
-            raise GameWon
 
         if color:
             self.current_color = color
@@ -186,8 +191,8 @@ class Game:
         row = self.board.get_empty_row_number(column)
         self.board.update_board(self.current_color, row, column)
 
-        if self.is_draw():
+        if self.is_draw(column, row):
             raise GameDrawn
 
-        if self.player_won():
+        if self.player_won(column, row):
             raise GameWon
