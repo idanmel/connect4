@@ -1,4 +1,6 @@
 import random
+
+from typing import List
 from game.game import get_possible_moves, Game, Board, Player
 from game.exceptions import GameWon, GameDrawn
 
@@ -7,15 +9,28 @@ def get_random_column(number_of_columns=7) -> int:
     return random.randint(0, number_of_columns - 1)
 
 
-def found_opponent_winning_move(board, column):
+def get_winning_column(board: Board, columns: List[int]):
     copied_board = board.rows
-    g = Game(board=Board(rows=copied_board))
-    try:
-        g.make_move(column, color=g.get_opponent_color())
-    except GameDrawn:
-        return False
-    except GameWon:
-        return True
+    for column in columns:
+        g = Game(board=Board(rows=copied_board))
+        try:
+            g.make_move(column)
+        except GameDrawn:
+            continue
+        except GameWon:
+            return column
+
+
+def get_opponent_winning_column(board: Board, columns: List[int]) -> int:
+    copied_board = board.rows
+    for column in columns:
+        g = Game(board=Board(rows=copied_board))
+        try:
+            g.make_move(column, color=g.get_opponent_color())
+        except GameDrawn:
+            pass
+        except GameWon:
+            return column
 
 
 class RandomBot(Player):
@@ -53,19 +68,23 @@ class Monte(Player):
     def get_column(self, board=None) -> int:
 
         print("\n*** Hmmm... Let me think... ***")
+        if not board:
+            board = Board()
+
         columns = get_possible_moves(board)
-        for column in columns:
-            if found_opponent_winning_move(board, column):
-                return column
+        column = get_winning_column(board, columns)
+        if column:
+            return column
+
+        column = get_opponent_winning_column(board, columns)
+        if column:
+            return column
 
         games_per_column = self.number_of_games // len(columns)
         win_rate = []
         for column in columns:
-            wins = 0
-            for i in range(games_per_column):
-                result = self.get_random_game_result(board, column)
-                if result:
-                    wins += 1
-            win_rate.append((wins, column))
+            results = [self.get_random_game_result(board, column) for _ in range(games_per_column)]
+            win_rate.append((results.count(True), column))
 
         return max(win_rate)[1]
+
