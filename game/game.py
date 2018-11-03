@@ -3,7 +3,6 @@ Connect 4
 """
 
 from typing import List
-import itertools
 import numpy as np
 
 from .exceptions import CellIsNotEmpty, GameDrawn, GameWon
@@ -185,7 +184,6 @@ class Game:
         else:
             self.current_player = self.get_player_to_move()
             self.current_color = self.get_color_to_move()
-
 
         if column is None:
             column = self.current_player.get_column(self.board)
