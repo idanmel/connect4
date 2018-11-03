@@ -1,8 +1,42 @@
 import pytest
 
 from game.game import Board, is_column_full, EMPTY_CELL, get_possible_moves
-from ai.bots import found_opponent_winning_move
-from game.exceptions import GameWon
+from ai.bots import get_random_column, get_winning_column, get_opponent_winning_column, RandomBot
+
+
+class TestGetRandomColumn:
+    def test_range(self):
+        assert 6 >= get_random_column() >= 0
+
+
+class TestGetWinningColumn:
+    def test_win(self):
+        b = Board(['ggg-'])
+        columns = [3]
+        assert get_winning_column(b, columns) == 3
+
+    def test_no_win(self):
+        b = Board(['rrr-'])
+        columns = [3]
+        assert not get_winning_column(b, columns)
+
+
+class TestGetOpponentWinningColumn:
+    def test_no_win(self):
+        b = Board(['ggg-'])
+        columns = [3]
+        assert not get_opponent_winning_column(b, columns)
+
+    def test_win(self):
+        b = Board(['rrr-'])
+        columns = [3]
+        assert get_opponent_winning_column(b, columns) == 3
+
+
+class TestRandomBot:
+    def test_random_bot(self):
+        r = RandomBot()
+        assert type(r.get_column()) == int
 
 
 class TestIsColumnFull:
@@ -32,19 +66,3 @@ class TestFindPossibleMoves:
             'g-'
         ])
         assert len(get_possible_moves(b)) > 1
-
-
-class TestFindOpponentWinningMove:
-    def test_nope(self):
-        b = Board(['rrr-'])
-        assert found_opponent_winning_move(b, 3)
-
-
-# class TestGetWinningMove:
-#     def test_one_winning_move(self):
-#         g = Game(Board(['ggg-', 'rrr-']))
-#         assert get_winning_move(g) == 3
-#
-#     def test_zero_winning_moves(self):
-#         g = Game(Board(['----']))
-#         assert get_winning_move(g) == 4
