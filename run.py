@@ -1,4 +1,4 @@
-from game.game import Game, HumanPlayer
+from game.game import Game, HumanPlayer, Player
 from game.exceptions import GameDrawn, GameWon
 from ai.bots import Monte, RandomBot
 import argparse
@@ -18,7 +18,7 @@ def get_players():
     return bot_options[args.p1](), bot_options[args.p2]()
 
 
-def play_game(player1=HumanPlayer(), player2=Monte()):
+def play_game(player1: Player = HumanPlayer(), player2: Player=Monte()):
 
     g = Game(player1, player2)
     print("\n" + str(g.board))
@@ -41,5 +41,5 @@ def play_game(player1=HumanPlayer(), player2=Monte()):
 
 
 if __name__ == '__main__':
-    player1, player2 = get_players()
-    play_game(player1, player2)
+    player_one, player_two = get_players()
+    play_game(player_one, player_two)
