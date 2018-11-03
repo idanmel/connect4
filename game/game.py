@@ -35,10 +35,6 @@ def get_possible_moves(board) -> List[int]:
     return columns
 
 
-def get_cloned_game(g):
-    return Game(board=g.board)
-
-
 class Player:
 
     def get_column(self, board=None) -> int:

@@ -1,7 +1,7 @@
 import pytest
 from itertools import product
 
-from game.game import is_winning_row, COLORS, Board, Game, EMPTY_CELL
+from game.game import is_winning_row, COLORS, Board, Game, EMPTY_CELL, Player
 from game.exceptions import CellIsNotEmpty, GameDrawn, GameWon
 
 rows = ["".join(row) for row in (list(product(COLORS, repeat=6)))]
@@ -180,7 +180,7 @@ class TestUpdateBoard:
             b.update_board(color='g', row=1, column=0)
 
 
-class TestPlayerTurn:
+class TestGetColor:
     def test_odd_move(self):
         g = Game(board=Board())
         assert g.get_color_to_move() == 'r'
@@ -188,6 +188,16 @@ class TestPlayerTurn:
     def test_even_move(self):
         g = Game(board=Board(['-r']))
         assert g.get_color_to_move() == 'g'
+
+
+class TestGetOpponentColor:
+    def test_odd_move(self):
+        g = Game(board=Board())
+        assert g.get_opponent_color() == 'g'
+
+    def test_even_move(self):
+        g = Game(board=Board(['-r']))
+        assert g.get_opponent_color() == 'r'
 
 
 class TestMove:
@@ -216,6 +226,11 @@ class TestMove:
         with pytest.raises(GameDrawn):
             g.make_move(0)
 
+    def test_move_with_color(self):
+        g = Game(board=Board(['--']))
+        g.make_move(0, 'g')
+        assert g.board == Board(['g-'])
+
 
 class TestGetEmptyRowNumber:
     def test_valid_row(self):
@@ -226,3 +241,10 @@ class TestGetEmptyRowNumber:
         b = Board(['r'])
         with pytest.raises(IndexError):
             b.get_empty_row_number(0)
+
+
+class TestPlayer:
+    def test_get_column(self):
+        p = Player()
+        with pytest.raises(NotImplementedError):
+            c = p.get_column()
