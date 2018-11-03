@@ -1,7 +1,7 @@
 import pytest
 
 from game.game import Board, is_column_full, EMPTY_CELL, get_possible_moves
-from ai.bots import get_random_column, get_winning_column, get_opponent_winning_column, RandomBot
+from ai.bots import get_random_column, get_winning_column, RandomBot
 
 
 class TestGetRandomColumn:
@@ -25,12 +25,12 @@ class TestGetOpponentWinningColumn:
     def test_no_win(self):
         b = Board(['ggg-'])
         columns = [3]
-        assert not get_opponent_winning_column(b, columns)
+        assert not get_winning_column(b, columns, opponent=True)
 
     def test_win(self):
         b = Board(['rrr-'])
         columns = [3]
-        assert get_opponent_winning_column(b, columns) == 3
+        assert get_winning_column(b, columns, opponent=True) == 3
 
 
 class TestRandomBot:

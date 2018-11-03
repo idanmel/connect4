@@ -1,4 +1,5 @@
 import random
+import timeit
 
 from typing import List
 from game.game import get_possible_moves, Game, Board, Player
@@ -9,26 +10,17 @@ def get_random_column(number_of_columns=7) -> int:
     return random.randint(0, number_of_columns - 1)
 
 
-def get_winning_column(board: Board, columns: List[int]):
+def get_winning_column(board: Board, columns: List[int], opponent=False):
     copied_board = board.rows
     for column in columns:
         g = Game(board=Board(rows=copied_board))
         try:
-            g.make_move(column)
+            color = g.get_color_to_move()
+            if opponent:
+                color = g.get_opponent_color()
+            g.make_move(column, color)
         except GameDrawn:
             continue
-        except GameWon:
-            return column
-
-
-def get_opponent_winning_column(board: Board, columns: List[int]) -> int:
-    copied_board = board.rows
-    for column in columns:
-        g = Game(board=Board(rows=copied_board))
-        try:
-            g.make_move(column, color=g.get_opponent_color())
-        except GameDrawn:
-            pass
         except GameWon:
             return column
 
@@ -41,7 +33,7 @@ class RandomBot(Player):
 
 class Monte(Player):
 
-    def __init__(self, number_of_games=5000):
+    def __init__(self, number_of_games=4000):
         self.number_of_games = number_of_games
         Player.__init__(self)
 
@@ -76,7 +68,7 @@ class Monte(Player):
         if column:
             return column
 
-        column = get_opponent_winning_column(board, columns)
+        column = get_winning_column(board, columns, opponent=True)
         if column:
             return column
 
@@ -88,3 +80,8 @@ class Monte(Player):
 
         return max(win_rate)[1]
 
+
+if __name__ == '__main__':
+    m = Monte()
+    tries = 10
+    print(timeit.timeit(m.get_column, number=tries) / tries)
