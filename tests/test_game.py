@@ -1,12 +1,14 @@
 import pytest
 from itertools import product
 
-from game.game import is_winning_row, COLORS, Board, Game, EMPTY_CELL, Player
+from game.game import is_winning_row, Board, Game, EMPTY_CELL, Player
 from game.exceptions import CellIsNotEmpty, GameDrawn, GameWon
+
+COLORS = 'r-'
 
 rows = ["".join(row) for row in (list(product(COLORS, repeat=6)))]
 
-winning_rows = [row for c in COLORS for row in rows if c * 4 in row]
+winning_rows = [row for row in rows if 'r' * 4 in row]
 not_winning_rows = [row for row in rows if row not in winning_rows]
 
 
@@ -16,12 +18,12 @@ def test_rows():
 
 def test_winning_rows():
     for row in winning_rows:
-        assert is_winning_row(row)
+        assert is_winning_row(row, 'r')
 
 
 def test_not_winning_rows():
     for row in not_winning_rows:
-        assert not is_winning_row(row)
+        assert not is_winning_row(row, 'r')
 
 
 class TestStr:
@@ -125,37 +127,11 @@ class TestBoardIsFull:
 
 
 class TestIsDraw:
-    def test_has_moves_not_won(self):
+    def test_no_moves_not_won(self):
         b = Board([EMPTY_CELL])
         g = Game(board=b)
-        assert not g.is_draw(0, 0)
-
-    def test_no_moves_not_won(self):
-        b = Board(['r'])
-        g = Game(board=b)
-        assert g.is_draw(0, 0)
-
-    def test_no_moves_won(self):
-        board = [
-            'gggg'
-        ]
-        b = Board(board)
-        g = Game(board=b)
-        assert not g.is_draw(3, 0)
-
-    def test_has_moves_won(self):
-        board = [
-            EMPTY_CELL * 7,
-            EMPTY_CELL * 7,
-            EMPTY_CELL * 7,
-            EMPTY_CELL * 7,
-            EMPTY_CELL * 7,
-            EMPTY_CELL + 'rrr' + EMPTY_CELL * 3,
-            EMPTY_CELL + 'gggg' + EMPTY_CELL * 2,
-        ]
-        g = Game(board=Board(board))
-        assert not g.is_draw(4, 0)
-
+        with pytest.raises(GameDrawn):
+            g.make_move(0, 'r')
 
 class TestUpdateBoard:
     def test_one_dimensional_board(self):

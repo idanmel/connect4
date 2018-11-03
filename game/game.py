@@ -12,11 +12,10 @@ EMPTY_CELL = '-'
 COLORS = 'rg'
 
 
-def is_winning_row(row: str, amount_to_win=4) -> bool:
+def is_winning_row(row: str, color: str, amount_to_win=4) -> bool:
     """Given a row, return True if there are enough adjacent pieces of the same player"""
-    for c in COLORS:
-        if c * amount_to_win in row:
-            return True
+    if color * amount_to_win in row:
+        return True
 
 
 def is_column_full(column):
@@ -104,9 +103,9 @@ class Board:
 
     def get_empty_row_number(self, column):
         """Get the lowest empty row for a given column"""
-        for i, v in enumerate(reversed(self.get_column(column))):
-            if v == EMPTY_CELL:
-                return self.shape[0] - 1 - i
+        for i in reversed(range(self.shape[0])):
+            if self._np_array[i][column] == EMPTY_CELL:
+                return i
 
         raise IndexError
 
@@ -149,11 +148,8 @@ class Game:
 
     def player_won(self, column, row) -> bool:
         """Return the winning player, if found"""
-        return any([is_winning_row(''.join(line), self.amount_to_win) for line in self.board.get_rows_by_cell(column, row)])
-
-    def is_draw(self, column, row) -> bool:
-        """Return True if there are no move left and game was not won"""
-        return self.board.is_full() and not self.player_won(column, row)
+        return any([is_winning_row(''.join(line), self.current_color, self.amount_to_win) for line in
+                    self.board.get_rows_by_cell(column, row)])
 
     def get_player_to_move(self) -> Player:
         """Return the color of the player that is next to move"""
@@ -191,8 +187,9 @@ class Game:
         row = self.board.get_empty_row_number(column)
         self.board.update_board(self.current_color, row, column)
 
-        if self.is_draw(column, row):
-            raise GameDrawn
-
         if self.player_won(column, row):
             raise GameWon
+
+        if self.board.is_full():
+            raise GameDrawn
+
