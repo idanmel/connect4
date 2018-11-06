@@ -9,7 +9,7 @@ from .exceptions import CellIsNotEmpty, GameDrawn, GameWon
 
 
 EMPTY_CELL = '-'
-COLORS = 'rg'
+COLORS = '￮￭'
 
 
 def is_winning_row(row: str, color: str, amount_to_win=4) -> bool:
